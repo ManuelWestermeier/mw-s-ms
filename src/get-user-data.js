@@ -1,3 +1,4 @@
+import Client from "wsnet-client";
 import { encrypt } from "../utis/crypto-api";
 import { defaultServerURL, defaultUserData, defaultUserName } from "./defaults";
 
@@ -48,7 +49,7 @@ export default function getUserData(userData, password) {
   userNameInput.focus();
 
   return new Promise((res) => {
-    document.querySelector("form").addEventListener("submit", e => {
+    document.querySelector("form").addEventListener("submit", async e => {
       e.preventDefault();
 
       let exit = false;
@@ -93,7 +94,16 @@ export default function getUserData(userData, password) {
         userData.servers.unshift(serverUrl);
       }
 
-      res([userName, serverUrl, userData]);
+      const client = new Client(serverUrl);
+      client.onclose = () => alert("connection los...reload the page") || location.reload();
+
+      const isAuth = await client.get("auth");
+
+      if (!isAuth) {
+        return errorField.innerText = "error: username is unavadible now";
+      }
+
+      res([userName, serverUrl, userData, client]);
     });
   });
 }

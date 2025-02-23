@@ -51,3 +51,7 @@ export function hash(data, salt = "10", times = 1) {
     }
     return hash.toString(CryptoJS.enc.Hex);
 }
+
+export function basicHash(data) {
+    return CryptoJS.SHA512(data).toString(CryptoJS.enc.Hex);
+}
