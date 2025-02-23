@@ -1,4 +1,5 @@
-import { defaultServerURL, defaultUserName } from "./defaults";
+import { encrypt } from "../utis/crypto-api";
+import { defaultServerURL, defaultUserData, defaultUserName } from "./defaults";
 
 const getUserDataHTML = `<form id="connect">
   <p>
@@ -17,7 +18,7 @@ const getUserDataHTML = `<form id="connect">
     Next
 </button>`;
 
-export default function getUserData(userData) {
+export default function getUserData(userData, password) {
   document.body.innerHTML = getUserDataHTML;
 
   const [serverInput, userNameInput] = document.querySelectorAll("input");
@@ -27,6 +28,8 @@ export default function getUserData(userData) {
   userNameInput.value = userData.userNames?.[0] ?? defaultUserName;
 
   function render() {
+    serverList.innerHTML = "";
+    userNameList.innerHTML = "";
     for (const serverUrl of userData.servers) {
       const option = document.createElement("option");
       option.value = serverUrl;
@@ -50,14 +53,18 @@ export default function getUserData(userData) {
 
       let exit = false;
       if (serverInput.value == "delete") {
-        userData.servers = [defaultServerURL, "delete"];
+        userData.servers = defaultUserData.servers;
         exit = true;
       }
       if (userNameInput.value == "delete") {
-        userData.userNames = [defaultUserName, "delete"];
+        userData.userNames = defaultUserData.userNames;
         exit = true;
       }
-      if (exit) return render();
+      if (exit) {
+        localStorage.setItem("mw-s-ms-user-data", encrypt(password, JSON.stringify(userData)));
+        render();
+        return;
+      }
 
       const userName = userNameInput.value, serverUrl = serverInput.value;
 
