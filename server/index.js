@@ -5,6 +5,11 @@ import { createServer } from "wsnet-server";
 const clients = {};
 const rooms = {};
 
+setInterval(() => {
+    console.log(clients);
+    console.log(rooms);
+}, 2_000);
+
 createServer({ port: 8080 }, async client => {
     const roomsJoined = [];
     let userName = false;
@@ -13,7 +18,7 @@ createServer({ port: 8080 }, async client => {
         if (!userName) return;
         for (const _client of rooms[id].clients) {
             if (_client != client) {
-                client[_client].say("message", message);
+                _client.say("message", message);
             }
         }
     }
@@ -23,6 +28,7 @@ createServer({ port: 8080 }, async client => {
         if (!areSetAndTheSameType(data, [["id", "string"], ["type", "string"], ["message", "string"]])) return false;
         const { id, type, message } = data;
         if (!roomsJoined.includes(id)) return false;
+        rooms[id].messages.push({ type, message });
         send(id, { type, message });
         return true;
     });
@@ -36,7 +42,7 @@ createServer({ port: 8080 }, async client => {
     });
 
     client.onGet("join", data => {
-        if (!userName) return;
+        if (!userName) return false;
         if (!areSetAndTheSameType(data, [["id", "string"], ["keyHash", "string"]])) return false;
         const { id, keyHash } = data;
 
@@ -58,6 +64,7 @@ createServer({ port: 8080 }, async client => {
 
         if (!rooms[id].keyHash == basicHash(keyHash)) return false;
         rooms[id].clients.push(userName);
+        rooms[id].messages.push({ type: "joined", data: userName });
         send(id, { type: "joined", data: userName });
         return rooms[id].messages;
     });
@@ -80,10 +87,13 @@ createServer({ port: 8080 }, async client => {
         clients[userName] = client;
 
         return true;
-    })
+    });
+
+    client.onerror = () => client.close()
 
     client.onclose = () => {
         if (!userName) return;
+        delete clients[userName];
         for (const room of roomsJoined) {
             const keys = Object.keys(rooms[room]);
             if (keys.length == 1) {

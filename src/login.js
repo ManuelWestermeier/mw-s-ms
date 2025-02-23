@@ -53,13 +53,17 @@ export default function login() {
                 localStorage.setItem("mw-s-ms-user-data", encrypt(password, JSON.stringify(defaultUserData)));
             }
             else {
-                const decData = decrypt(password, userData)
-                const isJson = isJSON(decData);
-                if (isJson[0]) {
-                    res([password, isJson[1]]);
-                }
-                else {
-                    errorField.innerText = "!error: wrong passwrod!\n!cannot decrypt userdata!\n>>please retry";
+                try {
+                    const decData = decrypt(password, userData);
+                    const isJson = isJSON(decData);
+                    if (isJson[0]) {
+                        res([password, isJson[1]]);
+                    }
+                    else {
+                        errorField.innerText = "!error: wrong passwrod!\n!cannot decrypt userdata!\n>>please retry";
+                    }
+                } catch (error) {
+                    errorField.innerText = "error: wrong password";
                 }
             }
         });

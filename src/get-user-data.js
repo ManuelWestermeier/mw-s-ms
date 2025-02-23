@@ -17,7 +17,8 @@ const getUserDataHTML = `<form id="connect">
   <p id="error"></p>
   <button type="submit">
     Next
-</button>`;
+</button>
+</form>`;
 
 export default function getUserData(userData, password) {
   document.body.innerHTML = getUserDataHTML;
@@ -49,7 +50,7 @@ export default function getUserData(userData, password) {
   userNameInput.focus();
 
   return new Promise((res) => {
-    document.querySelector("form").addEventListener("submit", async e => {
+    document.querySelector("form").addEventListener("submit", e => {
       e.preventDefault();
 
       let exit = false;
@@ -94,16 +95,20 @@ export default function getUserData(userData, password) {
         userData.servers.unshift(serverUrl);
       }
 
-      const client = new Client(serverUrl);
-      client.onclose = () => alert("connection los...reload the page") || location.reload();
+      let client = new Client(serverUrl);
+      client.onclose = () => alert("connection lost...reload the page") || location.reload();
 
-      const isAuth = await client.get("auth");
+      client.onopen = async () => {
+        const isAuth = await client.get("auth", userName);
 
-      if (!isAuth) {
-        return errorField.innerText = "error: username is unavadible now";
-      }
+        if (!isAuth) {
+          client.onclose = () => null;
+          client.close();
+          return errorField.innerText = "error: username is unavadible now";
+        }
 
-      res([userName, serverUrl, userData, client]);
+        res([userName, serverUrl, userData, client]);
+      };
     });
   });
 }
