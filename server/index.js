@@ -1,3 +1,4 @@
+import { basicHash } from "../utis/crypto-api.js";
 import { areSetAndTheSameType } from "are-set";
 import { createServer } from "wsnet-server";
 
@@ -50,12 +51,12 @@ createServer({ port: 8080 }, async client => {
                 messages: [
                     { type: "joined", data: userName }
                 ],
-                keyHash
+                keyHash: basicHash(keyHash),
             }
             return rooms[id].messages;
         }
 
-        if (!rooms[id].keyHash == keyHash) return false;
+        if (!rooms[id].keyHash == basicHash(keyHash)) return false;
         rooms[id].clients.push(userName);
         send(id, { type: "joined", data: userName });
         return rooms[id].messages;
