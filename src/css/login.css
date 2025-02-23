@@ -1,0 +1,79 @@
+:root {
+    /* Base color for gradient overlays */
+    --b: rgba(0, 0, 0, 0.7);
+    --accent: #007BFF;
+    --text: #333;
+}
+
+/* Global reset */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Body styling with the rock wall background and gradient overlays */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image:
+        linear-gradient(to bottom, var(--b), transparent),
+        linear-gradient(to bottom, transparent, var(--b)),
+        url(https://manuelwestermeier.github.io/bg.jpg);
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: multiply;
+    color: var(--text);
+}
+
+/* Form container styling */
+form {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    width: 320px;
+}
+
+/* Spacing for each paragraph (input group) */
+form p {
+    margin-bottom: 1.2rem;
+}
+
+/* Input field styling */
+form input {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+/* Button styling */
+button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Error message styling */
+#error {
+    color: red;
+    min-height: 1.2rem;
+    font-size: 0.9rem;
+}
